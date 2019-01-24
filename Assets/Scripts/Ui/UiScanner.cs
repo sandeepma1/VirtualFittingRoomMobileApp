@@ -107,7 +107,6 @@ public class UiScanner : MonoBehaviour
 
     private void OnScanComplete(string barCodeValue)
     {
-        print(barCodeValue);
         int itemId;
         Item item;
         //If barcode value is in int/numbers
@@ -134,7 +133,7 @@ public class UiScanner : MonoBehaviour
             StopBarcodeScanner();
             audioSource.Play();
             OnBarcodeScanComplete?.Invoke(item);
-            OpenCartWindow();
+            OpenItemViewerWindow();
         }
     }
 
@@ -149,9 +148,9 @@ public class UiScanner : MonoBehaviour
         BarcodeScanner.Stop();
     }
 
-    public void OpenCartWindow()
+    public void OpenItemViewerWindow()
     {
-        UiSwitchCanvas.Instance.ShowCartCanvas();
+        UiSwitchCanvas.Instance.ShowItemViewerCanvas();
     }
 
     /// <summary>

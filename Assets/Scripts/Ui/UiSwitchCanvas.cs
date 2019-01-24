@@ -6,6 +6,7 @@ public class UiSwitchCanvas : MonoBehaviour
     [SerializeField] private Canvas mainCanvas;
     [SerializeField] private Canvas scanCanvas;
     [SerializeField] private Canvas cartCanvas;
+    [SerializeField] private Canvas itemCanvas;
 
     private void Awake()
     {
@@ -22,8 +23,8 @@ public class UiSwitchCanvas : MonoBehaviour
         mainCanvas.sortingOrder = 1;
         scanCanvas.sortingOrder = 0;
         cartCanvas.sortingOrder = 0;
-        UiScanner.Instance.isScannerOn = false;
-        UiScanner.Instance.StopBarcodeScanner();
+        itemCanvas.sortingOrder = 0;
+        SetScanner(false);
     }
 
     public void ShowScanCanvas()
@@ -31,8 +32,8 @@ public class UiSwitchCanvas : MonoBehaviour
         scanCanvas.sortingOrder = 1;
         cartCanvas.sortingOrder = 0;
         mainCanvas.sortingOrder = 0;
-        UiScanner.Instance.isScannerOn = true;
-        UiScanner.Instance.StartBarcodeScanner();
+        itemCanvas.sortingOrder = 0;
+        SetScanner(true);
     }
 
     public void ShowCartCanvas()
@@ -40,7 +41,29 @@ public class UiSwitchCanvas : MonoBehaviour
         cartCanvas.sortingOrder = 1;
         scanCanvas.sortingOrder = 0;
         mainCanvas.sortingOrder = 0;
-        UiScanner.Instance.isScannerOn = false;
-        UiScanner.Instance.StopBarcodeScanner();
+        itemCanvas.sortingOrder = 0;
+        SetScanner(false);
+    }
+
+    public void ShowItemViewerCanvas()
+    {
+        itemCanvas.sortingOrder = 1;
+        cartCanvas.sortingOrder = 0;
+        scanCanvas.sortingOrder = 0;
+        mainCanvas.sortingOrder = 0;
+        SetScanner(false);
+    }
+
+    private void SetScanner(bool flag)
+    {
+        UiScanner.Instance.isScannerOn = flag;
+        if (flag)
+        {
+            UiScanner.Instance.StartBarcodeScanner();
+        }
+        else
+        {
+            UiScanner.Instance.StopBarcodeScanner();
+        }
     }
 }

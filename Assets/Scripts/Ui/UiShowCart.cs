@@ -2,11 +2,16 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class UiShowCart : MonoBehaviour
 {
+    public static Action<int> onTotalItemsChanged;
     public static UiShowCart Instance = null;
+    [SerializeField] private GameObject popupPanel;
     [SerializeField] private Button continueButton;
+    [SerializeField] private Button checkoutButton;
+    [SerializeField] private Button okButton;
     [SerializeField] private UiCartItem uiCartItemPrefab;
     [SerializeField] private Transform contentParent;
     [SerializeField] private TextMeshProUGUI subTotalLabelText;
@@ -14,8 +19,8 @@ public class UiShowCart : MonoBehaviour
     [SerializeField] private TextMeshProUGUI taxText;
     [SerializeField] private TextMeshProUGUI TotalText;
     public Dictionary<int, UiCartItem> uiCartItems = new Dictionary<int, UiCartItem>();
-
     private const float gstTax = 0.05f; //in %
+    public int totalItems = 0;
 
     private void Awake()
     {
@@ -25,18 +30,32 @@ public class UiShowCart : MonoBehaviour
     private void Start()
     {
         continueButton.onClick.AddListener(OnContinueButtonPressed);
-        UiScanner.OnBarcodeScanComplete += PopulateCart;
+        checkoutButton.onClick.AddListener(OnCheckoutButtonPressed);
+        okButton.onClick.AddListener(OnOkButtonPressed);
+        UiItemViewer.AddSelectedItem += PopulateCart;
     }
 
     private void OnDestroy()
     {
         continueButton.onClick.RemoveListener(OnContinueButtonPressed);
-        UiScanner.OnBarcodeScanComplete -= PopulateCart;
+        checkoutButton.onClick.RemoveListener(OnCheckoutButtonPressed);
+        okButton.onClick.RemoveListener(OnOkButtonPressed);
+        UiItemViewer.AddSelectedItem -= PopulateCart;
     }
 
     private void OnContinueButtonPressed()
     {
         UiSwitchCanvas.Instance.ShowScanCanvas();
+    }
+
+    private void OnCheckoutButtonPressed()
+    {
+        popupPanel.SetActive(true);
+    }
+
+    private void OnOkButtonPressed()
+    {
+        popupPanel.SetActive(false);
     }
 
     private void PopulateCart(Item item)
@@ -67,12 +86,13 @@ public class UiShowCart : MonoBehaviour
         float subTotal = 0;
         float tax = 0;
         float total = 0;
-        int totalItems = 0;
+        totalItems = 0;
         foreach (KeyValuePair<int, UiCartItem> entry in uiCartItems)
         {
             subTotal += entry.Value.Price * entry.Value.Quantity;
             totalItems += entry.Value.Quantity;
         }
+        onTotalItemsChanged?.Invoke(totalItems);
         tax = subTotal * gstTax;
         total = subTotal + tax;
 
